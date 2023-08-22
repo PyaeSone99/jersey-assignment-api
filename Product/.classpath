@@ -43,9 +43,17 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/mquery.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.json.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/Password.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/poi-ooxml-3.9.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/poi-ooxml-schemas-3.9.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/poi-4.1.1.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/poi-ooxml-4.1.1.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/poi-ooxml-schemas-4.1.1.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/poi-scratchpad-3.12.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/servlet-api.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/mssql-jdbc-12.4.0.jre8.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/mssql-jdbc-12.4.0.jre8-javadoc.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/mssql-jdbc-12.4.0.jre8-sources.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/log4j-api-2.18.0.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/commons-collections4-4.4.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/commons-compress-1.23.0.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/xmlbeans-3.1.0.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

@@ -5,17 +5,22 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import com.product.dto.PaginationResponse;
 import com.product.dto.ProductRequest;
 import com.product.dto.ProductResponse;
 import com.product.dto.UpdateProduct;
@@ -56,16 +61,17 @@ public class ProductApi {
 							@FormDataParam("image")FormDataContentDisposition contentDisposition,
 							@FormDataParam("price")double price,
 							@FormDataParam("quantity")int quantity)throws IOException {
-		if (file == null) {
+		if (file == null ) {
 			UpdateProduct updateProduct = new UpdateProduct(code,name,description,price,quantity);
-			System.out.println("here");
-			System.out.println(file);
 			return ProductService.updateWithOutImage(id,updateProduct);
+//			System.out.println("here");
+//			return null;
 		}else {
 			ProductRequest request = new ProductRequest(code,name,description,file,contentDisposition,price,quantity);
-			System.out.println("there");
-			System.out.println(file);
 			return ProductService.updateWithImage(id,request);
+//			System.out.println(file);
+//			System.out.println("there");
+//			return null;
 		}
 	}
 	
@@ -99,8 +105,22 @@ public class ProductApi {
 	
 	@DELETE
 	@Path("deleteProduct/{id}")
-	public Response delete(@PathParam("id")int id) {
-		return ProductService.deleteById(id);
+	public void delete(@PathParam("id")int id) {
+		 ProductService.deleteById(id);
+	}
+	
+	@GET
+	@Path("/findWithPager")
+	@Produces(MediaType.APPLICATION_JSON)
+	public PaginationResponse findWithPager(@QueryParam("page") @DefaultValue("0") int page,
+	        @QueryParam("limit") @DefaultValue("2") int limit,
+	        @QueryParam("search") String searchValue) throws SQLException{
+		int startIndex = (page) * limit;
+		List<ProductResponse> items = ProductService.findWithPager(startIndex,limit,searchValue);
+		int totalCount = ProductService.getTotalItemCount(searchValue);
+	    int totalPages = ProductService.calculateTotalPages(totalCount, limit);
+	    PaginationResponse response = new PaginationResponse(items, totalCount, totalPages);
+		return response;
 	}
 }
 

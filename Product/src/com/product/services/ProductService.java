@@ -26,7 +26,8 @@ import com.product.util.ConnectionDatasource;
 
 public class ProductService {
 	
-	private static String filePath = "D:/eclipse 2020 workspace/Product/WebContent/uploadImage/";
+	private static String filePath = "C:/Users/Dell-513/git/repository/Product/WebContent/uploadImage/";
+	
 	
 	public static ProductResponse create(ProductRequest productRequest)throws IOException {
 		
@@ -34,7 +35,6 @@ public class ProductService {
 			PreparedStatement statement = connection.prepareStatement("insert into product values(?,?,?,?,?,?,?)")){
 			String mainFilePath = filePath + productRequest.getContentDisposition().getFileName();
 			Files.copy(productRequest.getFilePath(), Paths.get(mainFilePath),StandardCopyOption.REPLACE_EXISTING);
-			
 			
 			statement.setString(1, productRequest.getCode());
 			statement.setString(2,productRequest.getDescription());
@@ -72,6 +72,7 @@ public class ProductService {
 					response.setName(result.getString("name"));
 					response.setDescription(result.getString("description"));
 					response.setFilePath(result.getString("filepath"));
+					response.setImageName(result.getString("imagename"));
 					response.setPrice(result.getDouble("price"));
 					response.setQuantity(result.getInt("quantity"));
 					list.add(response);
@@ -96,6 +97,7 @@ public class ProductService {
 						result.getString("name"),
 						result.getString("description"),
 						result.getString("filepath"),
+						result.getString("imagename"),
 						result.getDouble("price"),
 						result.getInt("quantity")
 						);
@@ -119,6 +121,7 @@ public class ProductService {
 						result.getString("name"),
 						result.getString("description"),
 						result.getString("filepath"),
+						result.getString("imagename"),
 						result.getDouble("price"),
 						result.getInt("quantity")
 						);
@@ -210,20 +213,106 @@ public class ProductService {
 				.build();
 	}
 	
-	public static Response deleteById(int id) {
+	public static void deleteById(int id) {
 		
 		try (Connection connection = ConnectionDatasource.getConnection();
 			 PreparedStatement statement = connection.prepareStatement("delete from product where id = ?")){
 			
 			statement.setInt(1, id);
 			statement.executeUpdate();
-			return Response.status(Response.Status.CREATED).entity("Order Deleted Successfully").build();
+//			return Response.status(Response.Status.CREATED).entity("Order Deleted Successfully").build();
 			
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
-		return null;
+//		return null;
 	}
+	
+	
+	public static List<ProductResponse> findWithPager(int startIndex,int limit,String searchValue) throws SQLException{
+		
+		try(Connection connection = ConnectionDatasource.getConnection();
+			PreparedStatement statement = buildSearchStatement(connection, startIndex, limit, searchValue)){
+			
+			ResultSet result = statement.executeQuery();
+			List<ProductResponse> list = new ArrayList<ProductResponse>();
+			while(result.next()) {
+				ProductResponse response = new ProductResponse();
+				response.setId(result.getInt("id"));
+				response.setCode(result.getString("code"));
+				response.setName(result.getString("name"));
+				response.setDescription(result.getString("description"));
+				response.setFilePath(result.getString("filepath"));
+				response.setImageName(result.getString("imagename"));
+				response.setPrice(result.getDouble("price"));
+				response.setQuantity(result.getInt("quantity"));
+				list.add(response);
+			} int totalCount = ProductService.getTotalItemCount(searchValue);
+		    int totalPages = ProductService.calculateTotalPages(totalCount, limit);
+		    
+			return list;
+		}
+	}
+	private static PreparedStatement buildSearchStatement(Connection connection, int startIndex, int limit, String searchValue) throws SQLException {
+	    String baseQuery = "SELECT * FROM product";
+	    String searchCondition = "";
+	    
+	    if (searchValue != null && !searchValue.isEmpty()) {
+	        searchCondition = " WHERE code LIKE ? OR name LIKE ?";
+	    }
+
+	    String finalQuery = baseQuery + searchCondition + " ORDER BY id OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+
+	    PreparedStatement statement = connection.prepareStatement(finalQuery);
+	    int paramIndex = 1;
+	    
+	    if (searchValue != null && !searchValue.isEmpty()) {
+	        statement.setString(paramIndex++, "%" + searchValue + "%"); // For code search
+	        statement.setString(paramIndex++, "%" + searchValue + "%"); // For name search
+	    }
+	    
+	    statement.setInt(paramIndex++, startIndex);
+	    statement.setInt(paramIndex++, limit);
+
+	    return statement;
+	}
+    // New method to get the total count of items
+    public static int getTotalItemCount(String searchValue) throws SQLException {
+        try (Connection connection = ConnectionDatasource.getConnection();
+             PreparedStatement statement = buildCountStatement(connection, searchValue);
+             ResultSet result = statement.executeQuery()) {
+            if (result.next()) {
+                return result.getInt(1);
+            }
+            return 0;
+        }
+    }
+
+    // New method to calculate the total number of pages
+    public static int calculateTotalPages(int totalItems, int itemsPerPage) {
+        return (int) Math.ceil((double) totalItems / itemsPerPage);
+    }
+    
+    private static PreparedStatement buildCountStatement(Connection connection, String searchValue) throws SQLException {
+        String baseQuery = "SELECT COUNT(*) FROM product";
+        String searchCondition = "";
+        
+        if (searchValue != null && !searchValue.isEmpty()) {
+            searchCondition = " WHERE code LIKE ? OR name LIKE ?";
+        }
+
+        String finalQuery = baseQuery + searchCondition;
+
+        PreparedStatement statement = connection.prepareStatement(finalQuery);
+        int paramIndex = 1;
+        
+        if (searchValue != null && !searchValue.isEmpty()) {
+            statement.setString(paramIndex++, "%" + searchValue + "%"); // For code search
+            statement.setString(paramIndex++, "%" + searchValue + "%"); // For name search
+        }
+
+        return statement;
+    }
 	
 }
 

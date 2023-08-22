@@ -10,12 +10,13 @@ public class ProductResponse {
 	private String name;
 	private String description;
 	private String filePath;
+	private String imageName;
 	private double price;
 	private int quantity;
 	public ProductResponse() {
 		super();
 	}
-	public ProductResponse(int id,String code, String name, String description, String filePath, double price,
+	public ProductResponse(int id,String code, String name, String description, String filePath,String imageName, double price,
 			int quantity) {
 		super();
 		this.id = id;
@@ -23,6 +24,7 @@ public class ProductResponse {
 		this.name = name;
 		this.description = description;
 		this.filePath = filePath;
+		this.imageName = imageName;
 		this.price = price;
 		this.quantity = quantity;
 	}
@@ -67,6 +69,12 @@ public class ProductResponse {
 	}
 	public void setId(int id) {
 		this.id = id;
+	}
+	public String getImageName() {
+		return imageName;
+	}
+	public void setImageName(String imageName) {
+		this.imageName = imageName;
 	}
 	
 
